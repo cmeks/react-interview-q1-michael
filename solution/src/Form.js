@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { isNameValid, getLocations } from './mock-api/apis';
+import { debounce } from "lodash";
 import './Form.css';
 
 const FormComponent = () => {
@@ -31,18 +32,13 @@ const FormComponent = () => {
         }
     };
 
-    const onChangeName = async(event) => {
-        event.preventDefault();
-        const newName = event.target.value;
-        setName(newName);
-
-        // check for name validity and set the name. 
-        // Disable the form while the api call is occurring.
-        if (newName.trim() !== '') {
+    const validateName = async(input) => {
+        if (input.trim() !== '') {
             try {
                 setIsLoading(true);
-                const nameValidity = await isNameValid(newName);
+                const nameValidity = await isNameValid(input);
                 setIsValidName(nameValidity);
+                console.log(isValidName);
                 setIsLoading(false);
             } catch (error) {
                 // for general error handling, setting the error here
@@ -51,6 +47,14 @@ const FormComponent = () => {
                 setError('Error validating the provided name');
             }
         }
+    }; 
+
+    const debouncedValidateName = debounce(validateName, 500);
+
+    const onChangeName = (event) => {
+        event.preventDefault();
+        setName(event.target.value);
+        debouncedValidateName(event.target.value);
     };
 
     // change the location based on the selection from the dropdown
@@ -98,7 +102,7 @@ const FormComponent = () => {
                 </div>
                 <div className="location-field">
                     <label className="form-label">Location</label>
-                    <select className="input-box" value={location} onChange={onChangeLocation} disabled={isLoading}>
+                    <select className="input-box" value={location} onChange={onChangeLocation}>
                         {locations.map((location, index) => {
                             return (   
                                 <option className="location-dropdown-option" key={index} value={location}>
