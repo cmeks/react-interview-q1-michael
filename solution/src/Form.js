@@ -38,7 +38,6 @@ const FormComponent = () => {
                 setIsLoading(true);
                 const nameValidity = await isNameValid(input);
                 setIsValidName(nameValidity);
-                console.log(isValidName);
                 setIsLoading(false);
             } catch (error) {
                 // for general error handling, setting the error here
@@ -86,7 +85,6 @@ const FormComponent = () => {
             setTableData([...tableData, newTableVal]);
             setName('');
             setLocation('');
-            console.log(tableData);
         }
     };
 
